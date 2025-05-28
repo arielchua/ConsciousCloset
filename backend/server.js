@@ -14,6 +14,7 @@ const listingSchema = new mongoose.Schema({
   price: Number,
   description: String,
   imageUrl: String,
+  ownerEmail: String, // <-- Add this to track who owns the listing
 });
 
 const Listing = mongoose.model("Listings", listingSchema);
@@ -31,7 +32,7 @@ app.get("/api/listings", async (req, res) => {
 // POST a new listing
 app.post("/api/listings", async (req, res) => {
   try {
-    const newListing = new Listing(req.body);
+    const newListing = new Listing(req.body); // expects ownerEmail in body
     await newListing.save();
     res.status(201).json(newListing);
   } catch (err) {
@@ -39,21 +40,78 @@ app.post("/api/listings", async (req, res) => {
   }
 });
 
-// PUT (update) a listing by ID
+// PUT (update) a listing by ID — only owner can update
 app.put("/api/listings/:id", async (req, res) => {
   try {
-    const updatedListing = await Listing.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updatedListing);
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) return res.status(404).json({ message: "Listing not found" });
+
+    if (listing.ownerEmail !== req.body.ownerEmail) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    Object.assign(listing, req.body);
+    await listing.save();
+    res.json(listing);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
-// DELETE a listing by ID
+// DELETE a listing by ID — only owner can delete
 app.delete("/api/listings/:id", async (req, res) => {
   try {
-    await Listing.findByIdAndDelete(req.params.id);
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) return res.status(404).json({ message: "Listing not found" });
+
+    if (listing.ownerEmail !== req.body.ownerEmail) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    await listing.deleteOne();
     res.json({ message: "Listing deleted" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+
+const cartItemSchema = new mongoose.Schema({
+  productId: String,
+  title: String,
+  price: Number,
+  imageUrl: String,
+  ownerEmail: String,
+});
+
+const CartItem = mongoose.model("CartItems", cartItemSchema);
+
+// Get cart items for a user
+app.get("/api/cart/:email", async (req, res) => {
+  try {
+    const items = await CartItem.find({ ownerEmail: req.params.email });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Add to cart
+app.post("/api/cart", async (req, res) => {
+  try {
+    const item = new CartItem(req.body);
+    await item.save();
+    res.status(201).json(item);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Remove from cart
+app.delete("/api/cart/:id", async (req, res) => {
+  try {
+    await CartItem.findByIdAndDelete(req.params.id);
+    res.json({ message: "Item removed" });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

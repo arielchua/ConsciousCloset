@@ -1,0 +1,129 @@
+.profile-page {
+  min-height: 100vh;
+  background-color: #fef7eb;
+  padding: 40px;
+  font-family: "Segoe UI", sans-serif;
+  color: #3d2a17;
+  position: relative;
+}
+
+.top-left {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+}
+
+.profile-page h1,
+.profile-page h2 {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.listing-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.listing-card {
+  width: 300px;
+  background-color: #ffffff;
+  border: 1px solid #eadcc5;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.listing-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.price {
+  font-weight: bold;
+  color: #7a4c2e;
+}
+
+.category {
+  font-size: 0.95rem;
+  color: #8a6b4d;
+  margin-bottom: 8px;
+}
+
+.listing-form {
+  max-width: 500px;
+  margin: 0 auto 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listing-form input,
+.listing-form textarea,
+.listing-form select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #c9ab8c;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.listing-form input:focus,
+.listing-form textarea:focus,
+.listing-form select:focus {
+  border-color: #a97442;
+  outline: none;
+}
+
+.btn-view {
+  background-color: #a97442;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #5a3e1b;
+  border: 2px solid #5a3e1b;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background-color: #f3e8db;
+}
+
+.btn-filled {
+  background-color: #5a3e1b;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-filled:hover {
+  background-color: #7a5432;
+}
+
+.listing-form button + button {
+  margin-top: 8px;
+}
+

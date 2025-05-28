@@ -1,0 +1,95 @@
+.cartpage {
+  min-height: 100vh;
+  background-color: #fef7eb;
+  padding: 40px;
+  font-family: "Segoe UI", sans-serif;
+  color: #5a3e1b;
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.cart-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.cart-empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #7b5c3f;
+  margin-top: 100px;
+}
+
+.cart-listings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.cart-card {
+  width: 300px;
+  background-color: #fff;
+  border: 1px solid #eadcc5;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+}
+
+.cart-details {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-details h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #5a3e1b;
+  margin: 0;
+}
+
+.cart-price {
+  font-size: 1rem;
+  color: #7b5c3f;
+}
+
+/* Button Reuse */
+.btn {
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline {
+  padding: 10px 18px;
+  background-color: #fff;
+  color: #5a3e1b;
+  border: 2px solid #5a3e1b;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: #a97442;
+  border: none;
+  font-weight: bold;
+}
