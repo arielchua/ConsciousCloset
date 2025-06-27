@@ -20,9 +20,15 @@ const listingSchema = new mongoose.Schema({
 const Listing = mongoose.model("Listings", listingSchema);
 
 // GET all listings
+// GET all listings or just the current user's listings
 app.get("/api/listings", async (req, res) => {
   try {
-    const listings = await Listing.find();
+    const { ownerEmail } = req.query;
+
+    const listings = ownerEmail
+      ? await Listing.find({ ownerEmail }) // filter by user
+      : await Listing.find();              // return all
+
     res.json(listings);
   } catch (err) {
     res.status(500).json({ message: err.message });
