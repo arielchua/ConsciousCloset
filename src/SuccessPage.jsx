@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./CartPage.css"; // Reuse your existing button and layout styles
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
+import "./CartPage.css"; // Reuse your existing styles
 
 export default function SuccessPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          // Clear cart for the logged-in user
+          await fetch(`http://localhost:4000/api/cart/clear/${user.email}`, {
+            method: "DELETE",
+          });
+          console.log("Cart cleared after successful payment.");
+        } catch (err) {
+          console.error("Failed to clear cart:", err);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="cartpage" style={{ textAlign: "center" }}>

@@ -1,44 +1,57 @@
+// Load environment variables first
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Define schema and model
+// ======= MongoDB Schemas =======
+
 const listingSchema = new mongoose.Schema({
   title: String,
   category: String,
   price: Number,
   description: String,
   imageUrl: String,
-  ownerEmail: String, // <-- Add this to track who owns the listing
+  ownerEmail: String,
 });
 
 const Listing = mongoose.model("Listings", listingSchema);
 
-// GET all listings
-// GET all listings or just the current user's listings
+const cartItemSchema = new mongoose.Schema({
+  productId: String,
+  title: String,
+  price: Number,
+  imageUrl: String,
+  ownerEmail: String,
+});
+
+const CartItem = mongoose.model("CartItems", cartItemSchema);
+
+// ======= Listing Routes =======
+
+// Get all listings or listings by owner
 app.get("/api/listings", async (req, res) => {
   try {
     const { ownerEmail } = req.query;
-
     const listings = ownerEmail
-      ? await Listing.find({ ownerEmail }) // filter by user
-      : await Listing.find();              // return all
-
+      ? await Listing.find({ ownerEmail })
+      : await Listing.find();
     res.json(listings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// POST a new listing
+// Create a new listing
 app.post("/api/listings", async (req, res) => {
   try {
-    const newListing = new Listing(req.body); // expects ownerEmail in body
+    const newListing = new Listing(req.body);
     await newListing.save();
     res.status(201).json(newListing);
   } catch (err) {
@@ -46,7 +59,7 @@ app.post("/api/listings", async (req, res) => {
   }
 });
 
-// PUT (update) a listing by ID — only owner can update
+// Update a listing
 app.put("/api/listings/:id", async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id);
@@ -64,7 +77,7 @@ app.put("/api/listings/:id", async (req, res) => {
   }
 });
 
-// DELETE a listing by ID — only owner can delete
+// Delete a listing
 app.delete("/api/listings/:id", async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id);
@@ -81,16 +94,7 @@ app.delete("/api/listings/:id", async (req, res) => {
   }
 });
 
-
-const cartItemSchema = new mongoose.Schema({
-  productId: String,
-  title: String,
-  price: Number,
-  imageUrl: String,
-  ownerEmail: String,
-});
-
-const CartItem = mongoose.model("CartItems", cartItemSchema);
+// ======= Cart Routes =======
 
 // Get cart items for a user
 app.get("/api/cart/:email", async (req, res) => {
@@ -102,7 +106,7 @@ app.get("/api/cart/:email", async (req, res) => {
   }
 });
 
-// Add to cart
+// Add an item to cart
 app.post("/api/cart", async (req, res) => {
   try {
     const item = new CartItem(req.body);
@@ -113,7 +117,7 @@ app.post("/api/cart", async (req, res) => {
   }
 });
 
-// Remove from cart
+// Remove an item from cart
 app.delete("/api/cart/:id", async (req, res) => {
   try {
     await CartItem.findByIdAndDelete(req.params.id);
@@ -123,20 +127,18 @@ app.delete("/api/cart/:id", async (req, res) => {
   }
 });
 
-// MongoDB connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-    app.listen(4000, () => console.log("Server running on port 4000"));
-  })
-  .catch((err) => console.error("MongoDB connection error:", err));
+// Clear all cart items for a user
+app.delete("/api/cart/clear/:email", async (req, res) => {
+  try {
+    await CartItem.deleteMany({ ownerEmail: req.params.email });
+    res.status(200).json({ message: "Cart cleared" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to clear cart" });
+  }
+});
 
+// ======= Stripe Checkout =======
 
-
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
-// Stripe Checkout Session
 app.post("/api/create-checkout-session", async (req, res) => {
   const { items } = req.body;
 
@@ -165,3 +167,13 @@ app.post("/api/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// ======= Start Server =======
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB connected");
+    app.listen(4000, () => console.log("🚀 Server running on port 4000"));
+  })
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
